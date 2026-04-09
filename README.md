@@ -2,20 +2,24 @@
 
 ## Overview
 
-This project implements a fully connected feedforward neural network from scratch using only NumPy.
+This project was implemented as a self-learning exercise to gain a deeper understanding of neural networks.
 
-The goal is to solve a 3D nonlinear classification problem, where points are classified based on their position relative to a curved surface.
+It focuses on building a feedforward neural network from scratch using NumPy, including forward propagation, backpropagation, and gradient descent, without relying on deep learning frameworks.
 
 ---
 
 ## Problem Definition
 
-We generate random 3D data points (x, y, z) and classify them using the following decision boundary:
+We generate random 3D data points (x, y, z) and classify them based on their position relative to a nonlinear surface:
 
 z > -(x - 3)^2 - (y - 5)^2 + 8
 
+The task is essentially to determine whether each point lies **above or below a curved surface (paraboloid)**.
+
 * Class 1 → points above the surface
 * Class 0 → points below the surface
+
+This can be interpreted as a geometric problem of separating points **above and under a 3D curve**, making it a nonlinear classification task.
 
 ---
 
@@ -81,3 +85,8 @@ python main.py
 * Add Adam optimizer
 * Improve weight initialization (Xavier/He)
 * Visualize decision boundary in 3D
+
+## Training Loss
+
+![Loss Curve](images/plot_loss.png)
+![accuracy](images/loss.png)
