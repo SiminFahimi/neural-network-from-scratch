@@ -88,5 +88,5 @@ python main.py
 
 ## Training Loss
 
-![Loss Curve](images/plot_loss.png)
-![accuracy](images/loss.png)
+![Loss Curve](image/plot_loss.png)
+![accuracy](image/loss.png)
