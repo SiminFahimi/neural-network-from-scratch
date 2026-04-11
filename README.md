@@ -99,26 +99,33 @@ Parameters are updated using gradient descent:
 ### 1. Install dependencies
 ```bash
 pip install numpy matplotlib
-2. Run training
+```
+---
+
+### 2. Run training
 python main.py
-Output Visualizations
-Training loss curve
-3D prediction visualization (correct vs incorrect points)
-True decision boundary surface
-Key Learning Outcome
+---
+
+Output Visualizations:
+- Training loss curve
+- 3D prediction visualization (correct vs incorrect points)
+- Key Learning Outcome
+---
 
 This project demonstrates a deep understanding of:
 
-Neural network fundamentals
-Vectorized numerical computation
-Optimization techniques
-Model verification through gradient checking
-Future Improvements
-Mini-batch gradient descent
-ReLU activation function support
-Softmax multi-class extension
-Regularization tuning and experiments
-```
+- Neural network fundamentals
+- Vectorized numerical computation
+- Optimization techniques
+- Model verification through gradient checking
+---
+
+ Future Improvements:
+- Mini-batch gradient descent
+- ReLU activation function support
+- Softmax multi-class extension
+- Regularization tuning and experiments
+
 
 ## Results
 
