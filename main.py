@@ -58,7 +58,7 @@ plt.xlabel("Epoch")
 plt.ylabel("Cost")
 plt.legend()
 plt.grid(True)
-plt.savefig("assets/costs.png")
+plt.savefig("assets/cost_curve.png")
 plt.show()
 
 print("Final Cost:", costs[-1])

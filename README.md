@@ -34,14 +34,14 @@ The network learns to classify points in 3D space as 0 or 1.
 
 ## Project Structure
 
-
+```
 .
 ├── main.py # Training, evaluation, and visualization
 ├── model.py # Neural network implementation
 ├── generate_data.py # Synthetic dataset generation
 ├── requirements.txt # Dependencies
 └── README.md
-
+```
 
 ---
 
