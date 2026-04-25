@@ -77,7 +77,7 @@ def lr_effection(dataset, learning_rates, fold_num, num_epochs, net):
         y_label="Cost",
         line_label=["CV Cost", "Train Cost"],
         title="Learning Rate Comparison",
-        save_address="results/lr_comparison.png",
+        save_address="assets/lr_comparison.png",
     )
     plot_curves(curves)
     return best_lr
@@ -96,7 +96,7 @@ def cost_of_best_lr_each_epoch(dataset, best_lr, num_epochs, net):
         y_label="Cost",
         line_label=[f"lr={best_lr}"],
         title="Cost Curve on Best LR",
-        save_address="results/cost_each_epoch.png",
+        save_address="assets/cost_each_epoch.png",
     )
     plot_curves(best_curve_plot)
 
@@ -125,7 +125,7 @@ def size_effection_on_cost(counts, fold_num, num_epochs, lr, net):
             y_label="Cost",
             line_label=["CV Cost", "Train Cost"],
             title="Effect of Data Size on Cost",
-            save_address="results/effect_of_increasing_size.png",
+            save_address="assets/effect_of_increasing_size.png",
         )
     )
 
@@ -136,7 +136,8 @@ def size_effection_on_accuracy(counts, num_epochs, lr, net):
 
     for n in counts:
         x_data, y_data, x_test, y_test, _, _ = data(n, data_eng= True)
-net.weights = net.initialize_weights()
+
+        net.weights = net.initialize_weights()
         net.fit(x_data, y_data, num_epochs, lr)
 
         acc, _ = test(net, x_test, y_test)
@@ -149,6 +150,6 @@ net.weights = net.initialize_weights()
             y_label="Test Accuracy",
             line_label=["Accuracy"],
             title="Accuracy vs Data Size",
-            save_address="results/accuracy_vs_size.png",
+            save_address="assets/accuracy_vs_size.png",
         )
     )

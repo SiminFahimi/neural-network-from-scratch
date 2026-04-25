@@ -2,7 +2,7 @@ import numpy as np
 import copy
 from utils import *
 class FeedforwardNeuralNetwork:
-    def init(
+    def __init__(
         self,
         num_layers,
         num_features,
@@ -124,7 +124,8 @@ class FeedforwardNeuralNetwork:
 
         for _layer_idx in range(0, num_layers - 1):
             _ = np.zeros((self.get_layer_size(_layer_idx + 1), self.get_layer_size(_layer_idx) + 1))
-m = y_data.shape[0]
+
+        m = y_data.shape[0]
         gradients = [None] * (num_layers - 1)
 
         for layer_idx in range(0, num_layers - 1):

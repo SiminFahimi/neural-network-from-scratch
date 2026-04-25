@@ -51,5 +51,5 @@ def main():
 
     plot_3d_predictions(x_test, y_test, test_prediction, x_std, x_mean)
 
-if name == "main":
+if __name__ == "__main__":
     main()

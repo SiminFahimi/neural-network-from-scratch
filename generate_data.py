@@ -56,17 +56,6 @@ def data(count, data_eng=False):
 #     r = (np.sum((x - x_mean) * (y - y_mean))) / (( np.sqrt(np.sum(np. square(x - x_mean)))) *  (np.sqrt(np.sum(np. square(y - y_mean)))))
 #     return r
 
-def decision_tree(x):
+# def decision_tree(x):
 
-    tresholds = [np.mean(x), np.median(x)]
-    xs= {}
-
-    for i in range(x.shape[1]):
-        xs[i] = x[:,i]
-
-    for T in tresholds:
-        left = None
-        equel = None
-        right = None
-        for k in xs.keys():
-            left = np.where(k<T, k, 0)
+#     pass
