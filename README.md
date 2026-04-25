@@ -1,4 +1,3 @@
-:::writing
 # Neural Network From Scratch (NumPy)
 
 A fully connected feedforward neural network implemented entirely from scratch using NumPy.  
@@ -79,7 +78,7 @@ The script will:
 ---
 
 ## Project Structure
-
+```
 neural-network/
 │
 ├── main.py              # Main experiment pipeline
@@ -91,7 +90,7 @@ neural-network/
 ├── utils.py             # Helper functions
 ├── requirements.txt     # Project dependencies
 └── README.md
-
+```
 ---
 
 ## Future Work
