@@ -96,7 +96,7 @@ def cost_of_best_lr_each_epoch(dataset, best_lr, num_epochs, net):
         y_label="Cost",
         line_label=[f"lr={best_lr}"],
         title="Cost Curve on Best LR",
-        save_address="results/cost_each_epochs.png",
+        save_address="results/cost_each_epoch.png",
     )
     plot_curves(best_curve_plot)
 
