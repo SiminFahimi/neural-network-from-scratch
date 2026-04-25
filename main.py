@@ -1,74 +1,55 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from generate_data import generate_train_data, generate_test_data
-from model import FeedforwardNeuralNetwork, sigmoid, sigmoid_prime
+from plots import *
+from generate_data import data
+from eval import *
+from train import *
 
+def main():
+    counts = [2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+    fold_num = 4
 
-def plot_3d_predictions(X, Y_true, Y_pred):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    dataset = data(2000, data_eng = True)
+    x_data, y_data, x_test, y_test, x_mean, x_std = dataset
 
-    correct = (Y_true == Y_pred).flatten()
+    learning_rates = [
+        0.001,
+        0.002,
+        0.004,
+        0.008,
+        0.016,
+        0.032,
+        0.064,
+        0.128,
+        0.256,
+        0.512,
+        1.024,
+        2.048,
+        4.096,
+        9.192,
+    ]
+    num_epochs = 100
 
-    # True decision surface
-    x = np.linspace(-10, 20, 50)
-    y = np.linspace(-10, 20, 50)
-    Xs, Ys = np.meshgrid(x, y)
-    Zs = -(Xs - 3)**2 - (Ys - 5)**2 + 8
-
-    ax.plot_surface(Xs, Ys, Zs, alpha=0.4)
-
-    # Test points
-    ax.scatter(
-        X[correct, 0], X[correct, 1], X[correct, 2],
-        s=5   
+    net = FeedforwardNeuralNetwork(
+        num_layers=4,
+        num_features=x_data.shape[1],
+        num_hidden_units=[32, 16],
+        num_classes=1,
+        activation_func=[relu, relu, sigmoid],
+        activation_func_prime=[relu_prime, relu_prime, sigmoid_prime],
+        weights=None,
     )
 
-    ax.scatter(
-        X[~correct, 0], X[~correct, 1], X[~correct, 2],
-        s=5   
-    )
+    best_lr = lr_effection(dataset, learning_rates, fold_num, num_epochs, net)
+    size_effection_on_cost(counts, fold_num, num_epochs, best_lr, net)
+    size_effection_on_accuracy(counts, num_epochs, best_lr, net)
+    cost_of_best_lr_each_epoch(dataset,best_lr, num_epochs,net)
 
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    ax.set_zlabel("Z")
-    plt.savefig("assets/prediction_3d.png")
-    plt.title("Predictions + Decision Surface")
-    plt.show()
+    net.weights = net.initialize_weights()
+    net.fit(x_data, y_data, num_epochs, best_lr)
+    test_acc, test_prediction = test(net, x_test, y_test)
+    print("TEST ACC:", test_acc)
+    print(np.sum(y_data == 0), np.sum(y_data == 1))
 
-# MAIN 
+    plot_3d_predictions(x_test, y_test, test_prediction, x_std, x_mean)
 
-epoch = 300
-
-X_train, Y_train = generate_train_data(10000)
-
-NN = FeedforwardNeuralNetwork(
-    num_layers=5,
-    num_features=3,
-    num_hidden_units={1:10, 2:10, 3:10},
-    num_classes=1,
-    activation_func=sigmoid,
-    activation_func_prime=sigmoid_prime,
-    theta=None
-)
-
-costs = NN.train(X_train, Y_train, epoch)
-plt.plot(range(1, epoch + 1), costs, label="Cost")
-plt.xlabel("Epoch")
-plt.ylabel("Cost")
-plt.legend()
-plt.grid(True)
-plt.savefig("assets/cost_curve.png")
-plt.show()
-
-print("Final Cost:", costs[-1])
-
-X_test, Y_test = generate_test_data(2000)
-output = NN.predict(X_test)
-
-accuracy = (output == Y_test).mean()
-print("Accuracy:", accuracy)
-
-
-# Visualizations
-plot_3d_predictions(X_test, Y_test, output)
+if name == "main":
+    main()
