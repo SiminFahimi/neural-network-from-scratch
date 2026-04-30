@@ -1,55 +1,101 @@
 # Neural Network from Scratch (NumPy)
 
-A feedforward neural network implemented entirely with **Python + NumPy**, without using frameworks such as PyTorch or TensorFlow.
+A fully connected feedforward neural network implemented entirely with **Python + NumPy**, without using deep learning frameworks such as PyTorch or TensorFlow.
 
-This personal learning project was built to understand the internal mechanics of neural networks by implementing every major component manually, including forward propagation, backpropagation, optimization, and evaluation.
-
----
-
-## What This Project Covers
-
-- Fully connected feedforward neural network  
-- Forward pass implementation from scratch  
-- Backpropagation from scratch  
-- Binary cross-entropy loss  
-- Gradient descent optimization  
-- L2 regularization  
-- Cross-validation for model selection  
-- Experiment pipeline for testing:
-  - Learning rate  
-  - Regularization strength  
-  - Dataset size  
+This project was developed to understand the internal mechanics of neural networks by manually implementing forward propagation, backpropagation, optimization, regularization, and model evaluation from first principles.
 
 ---
 
-## Dataset
+## Highlights
 
-A synthetic binary classification dataset was generated using two input variables:
+- Neural network implemented entirely from scratch
+- Forward propagation
+- Backpropagation
+- Mini-batch gradient descent
+- Binary cross-entropy loss
+- L2 regularization
+- He / Xavier weight initialization
+- Gradient checking via finite differences
+- K-fold cross-validation
+- Hyperparameter tuning experiments
+- Visualization of training behavior and decision boundaries
 
-```python
-x ~ Uniform(-10, 10)
-y ~ Uniform(-10, 10)
-```
+---
 
-A nonlinear decision boundary was defined as:
+## Model Architecture
 
-```python
-f(x, y) = sin(x) + cos(y) + 0.15 * (x^2 + y^2) + 0.5 * sin(xy / 4)
-```
+Example network:
 
-Labels were assigned based on whether samples were above or below this surface, with added noise.
+Input Layer  
+→ Hidden Layer (ReLU)  
+→ Hidden Layer (ReLU)  
+→ Output Layer (Sigmoid)
 
+The implementation supports configurable:
+
+- Number of layers
+- Hidden units
+- Activation functions
+- Learning rate
+- Regularization strength
+- Batch size
+
+---
+
+## Dataset Generation
+
+A synthetic 3D binary classification dataset was constructed to create a nonlinear and controllable decision boundary.
+
+First, two input variables were sampled uniformly:
+
+- x ~ Uniform(-10, 10)
+- y ~ Uniform(-10, 10)
+
+A nonlinear surface was then defined using a custom function:
+
+z = f(x, y)
+
+To generate class separation, each sample was assigned a binary label:
+
+- Class 1: points above the surface  
+- Class 0: points below the surface  
+
+This was implemented by introducing a random vertical offset around the surface:
+
+z = f(x, y) + offset   if label = 1  
+z = f(x, y) - offset   if label = 0
+
+where:
+
+- offset ~ Uniform(1.0, 3.0)
+
+Finally, each data point is represented as:
+
+X = [x, y, z]
+
+This construction ensures a **non-linearly separable 3D classification problem**, requiring the model to learn complex decision boundaries rather than simple linear separation.
+---
+## Gradient Checking
+
+To verify the correctness of the backpropagation implementation, numerical gradient checking was performed using finite differences:
+
+$$
+\frac{\partial J}{\partial \theta}
+\approx
+\frac{J(\theta+\epsilon)-J(\theta-\epsilon)}{2\epsilon}
+$$
+
+The analytical gradients from backpropagation were compared against numerical estimates, confirming implementation correctness within a small tolerance.
 ---
 
 ## Feature Engineering
 
-Based on the structure of the dataset, several engineered features were added:
-
-- \( x^2 \)  
-- \( y^2 \)  
-- \( \sin(x) \)  
-- \( \cos(x) \)  
-
+To enhance non-linear representation, the following features were engineered:
+- x²
+- y²
+- sin(x)
+- cos(y)
+These produced small but consistent performance gains.
 ---
 
 ## Results
@@ -65,17 +111,22 @@ The performance gain was small but consistent.
 
 ## Training Curve
 ![cost each epoch](results/loss.png)
+...
 
 ## Effect of size
 ![accuracy vs size](results/size_effect_on_accuracy.png)
+...
 
 ![effect of increasing size](results/size_effect_on_cost.png)
+...
 
-## Lamba comparison
+## Lambda comparison
 ![Lamba comparison](results/lambda_effect.png)
+...
 
 ## Learning rate comparison
 ![lr comparison](results/lr_effect.png)
+...
 
 ## 3D Predictions
 ![Predictions](results/prediction_3d.png)
@@ -134,8 +185,4 @@ The performance gain was small but consistent.
 
 ## Summary
 
-This project explores:
-
-- Neural networks from first principles
-- The effect of feature representation
-- The impact of hyperparameters on training behavior
+This project demonstrates both mathematical understanding and engineering ability by implementing a neural network system entirely from scratch using NumPy, including optimization, regularization, verification, and structured experimentation.
