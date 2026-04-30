@@ -1,128 +1,124 @@
-# Neural Network From Scratch (NumPy)
+# Neural Network from Scratch (NumPy)
 
-A fully connected feedforward neural network implemented entirely from scratch using NumPy.  
-This project focuses on understanding the internal mechanics of neural networks without relying on high‑level deep learning frameworks such as TensorFlow or PyTorch.
+A feedforward neural network implemented entirely with **Python + NumPy**, without using frameworks such as PyTorch or TensorFlow.
 
-The goal is to explore how neural networks work at a fundamental level, including how gradients are computed, how parameters are updated, and how model performance can be evaluated and improved.
-
----
-
-## Project Overview
-
-The model is trained on a synthetic nonlinear dataset generated from the following function:
-
-z = sin(x) + cos(y)
-
-This produces a nonlinear decision boundary, making the classification problem more challenging and allowing the neural network to learn more complex patterns.
-
-The project experiments with different training configurations, initialization strategies, and evaluation techniques.
+This personal learning project was built to understand the internal mechanics of neural networks by implementing every major component manually, including forward propagation, backpropagation, optimization, and evaluation.
 
 ---
 
-## Features
+## What This Project Covers
 
-- Feedforward Neural Network implemented from scratch with NumPy
-- Forward propagation
-- Backpropagation
-- Multiple activation functions:
-  - Sigmoid
-  - ReLU
-- Weight initialization strategies:
-  - Xavier Initialization
-  - He Initialization
-- Gradient checking to verify backpropagation implementation
-- K-Fold Cross Validation
-- Learning rate comparison
-- Training and evaluation visualizations
-- Final evaluation on unseen test data
+- Fully connected feedforward neural network  
+- Forward pass implementation from scratch  
+- Backpropagation from scratch  
+- Binary cross-entropy loss  
+- Gradient descent optimization  
+- L2 regularization  
+- Cross-validation for model selection  
+- Experiment pipeline for testing:
+  - Learning rate  
+  - Regularization strength  
+  - Dataset size  
 
 ---
 
-## Cross Validation
+## Dataset
 
-To obtain a more reliable estimate of model performance, the project uses K-Fold Cross Validation.
+A synthetic binary classification dataset was generated using two input variables:
 
-Instead of splitting the dataset only once, the data is divided into multiple folds. The model is trained multiple times, each time using a different fold as the validation set while the remaining folds are used for training.
+```python
+x ~ Uniform(-10, 10)
+y ~ Uniform(-10, 10)
+```
 
-The final performance is computed as the average across all folds, which provides a better estimate of how well the model generalizes to unseen data.
+A nonlinear decision boundary was defined as:
 
----
+```python
+f(x, y) = sin(x) + cos(y) + 0.15 * (x^2 + y^2) + 0.5 * sin(xy / 4)
+```
 
-## Installation
-
-Clone the repository:
-
-git clone https://github.com/SiminFahimi/neural-network-from-scratch.git
-cd neural-network-from-scratch
-
-Install the required dependencies:
-
-pip install -r requirements.txt
+Labels were assigned based on whether samples were above or below this surface, with added noise.
 
 ---
 
-## Usage
+## Feature Engineering
 
-Run the main experiment:
+Based on the structure of the dataset, several engineered features were added:
 
-python main.py
+- \( x^2 \)  
+- \( y^2 \)  
+- \( \sin(x) \)  
+- \( \cos(x) \)  
 
-The script will:
+---
 
-- Generate a synthetic dataset
-- Train the neural network
-- Perform cross-validation
-- Evaluate model performance
-- Produce visualizations of the results
+## Results
+
+### Raw vs Engineered Features
+
+| Input Type          | Accuracy |
+|--------------------|----------|
+| Raw Features       | 0.9587   |
+| Engineered Features| 0.9663   |
+
+The performance gain was small but consistent.
+
+---
+
+## Experiments Conducted
+
+- Hyperparameter tuning  
+- Learning rate comparison  
+- L2 regularization analysis  
+- Dataset size impact  
+- Learning curves  
+- 3D decision boundary visualization  
 
 ---
 
 ## Project Structure
 ```
-neural-network/
-│
-├── main.py              # Main experiment pipeline
-├── model.py             # Neural network implementation
-├── train.py             # Training logic and cross-validation
-├── eval.py              # Model evaluation utilities
-├── generate_data.py     # Synthetic dataset generation
-├── plots.py             # Visualization utilities
-├── utils.py             # Helper functions
-├── requirements.txt     # Project dependencies
+.
+├── model.py # Neural network implementation
+├── train.py # Training pipeline
+├── evaluate.py # Model evaluation
+├── plots.py # Visualization utilities
+├── data.py # Synthetic dataset generation
+├── results/
+│ ├── loss.png
+│ ├── lr_effect.png
+│ ├── lambda_effect.png
+│ ├── size_effect_on_accuracy.png
+│ ├── size_effect_on_cost.png
+│ ├── prediction_3d.png
 └── README.md
 ```
 ---
 
-## Future Work
+## Implementation Notes
 
-This project is still under development. Planned improvements include:
-
-- Feature engineering to help the model capture more informative patterns
-- Improved preprocessing and data handling
-- Support for deeper network architectures
-- Additional activation functions
-- More advanced visualization tools
-- Experiments with more complex nonlinear functions
+- Implemented using NumPy only
+- No external machine learning libraries used
+- Focused on correctness, clarity, and learning fundamentals
 
 ---
 
-## Purpose
+## Possible Extensions
 
-The main objective of this project is educational:  
-to develop a deeper understanding of how neural networks work internally and how design choices such as activation functions, weight initialization, learning rate, and cross-validation influence model performance.
+- Adam optimizer
+- RMSProp optimizer
+- Mini-batch gradient descent
+- Deeper neural networks
+- Multi-class classification
+- PyTorch reimplementation for benchmarking
+- Automated feature selection
 
-## Results
+---
 
-### Training Loss
-![cost each epoch](results/cost_each_epoch.png)
+## Summary
 
-### Effect of size
-![accuracy vs size](results/accuracy_vs_size.png)
+This project explores:
 
-![effect of increasing size](results/effect_of_increasing_size.png)
-
-### Learning rates comparison
-![lr comparison](results/lr_comparison.png)
-
-### 3D Predictions
-![Predictions](results/prediction_3d.png)
+- Neural networks from first principles
+- The effect of feature representation
+- The impact of hyperparameters on training behavior

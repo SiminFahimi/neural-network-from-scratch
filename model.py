@@ -95,21 +95,20 @@ class FeedforwardNeuralNetwork:
         regularization = (lambda_ / (2 * m)) * regularization
         return regularization
 
-    def binary_cross_entropy_loss(self, h_theta, y_data, weights, regularize=True, lambda_=1e-3):
+    def binary_cross_entropy_loss(self, h_theta, y_data, weights, regularize=True, lambda_=0):
         m = y_data.shape[0]
 
         eps = 1e-12
         h = np.clip(h_theta, eps, 1 - eps)
 
-        cost = -np.sum(y_data * (np.log(h)) + (1 - y_data) * (np.log(1 - h))) / m
+        cost = -np.sum(y_data * np.log(h)+ (1 - y_data) * np.log(1 - h)) / m
 
         if regularize:
             cost += self.l2_regularization(lambda_, weights, m)
 
         return cost
 
-    def backpropagation(self, y_data, activations, z_list, weights):
-        lambda_ = 1e-3
+    def backpropagation(self, y_data, activations, z_list, weights, lambda_=0):
         g_prime = self.activation_func_prime
         num_layers = self.num_layers
 
@@ -118,21 +117,17 @@ class FeedforwardNeuralNetwork:
 
         for layer_idx in range(num_layers - 2, 0, -1):
             theta_l = weights[layer_idx]
-            delta[layer_idx] = (delta[layer_idx + 1].dot(theta_l[:, 1:])) * g_prime[layer_idx - 1](
-                z_list[layer_idx]
-            )
 
-        for _layer_idx in range(0, num_layers - 1):
-            _ = np.zeros((self.get_layer_size(_layer_idx + 1), self.get_layer_size(_layer_idx) + 1))
+            delta[layer_idx] = (
+                delta[layer_idx + 1].dot(theta_l[:, 1:])
+                * g_prime[layer_idx - 1](z_list[layer_idx])
+            )
 
         m = y_data.shape[0]
         gradients = [None] * (num_layers - 1)
 
-        for layer_idx in range(0, num_layers - 1):
-            delta_next = delta[layer_idx + 1]
-            gradients[layer_idx] = (delta_next.T).dot(
-                np.hstack((np.ones((m, 1)), activations[layer_idx]))
-            ) / m
+        for layer_idx in range(num_layers - 1):
+            gradients[layer_idx] = (delta[layer_idx + 1].T.dot(np.hstack((np.ones((m, 1)), activations[layer_idx]))) / m)
 
             gradients[layer_idx][:, 1:] += (lambda_ / m) * weights[layer_idx][:, 1:]
 
@@ -176,22 +171,47 @@ class FeedforwardNeuralNetwork:
 
         return weights
 
-    def fit(self, x_data, y_data, num_epoch, learning_rate):
+    def fit(self, x_data, y_data, num_epoch, learning_rate, lambda_=0, batch_size = 32, debug=False):
+        num_batch = len(x_data) // batch_size
         training_epochs_cost = []
 
         for epoch in range(num_epoch):
-            activations, z_list = self.forward_pass(x_data, self.weights)
-            gradients = self.backpropagation(y_data, activations, z_list, self.weights)
+            idx = np.random.permutation(len(x_data))
+            x_data = x_data[idx]
+            y_data = y_data[idx]
 
-            if epoch == 0:
-                flag = self.gradient_check(x_data, y_data, gradients, self.weights)
-                if flag is False:
-                    raise RuntimeError
+            x_batches = np.array_split(x_data, num_batch)
+            y_batches = np.array_split(y_data, num_batch)
+                
+            for i in range(num_batch):
 
-            cost = self.binary_cross_entropy_loss(activations[-1], y_data, self.weights)
+                x_batch = x_batches[i]
+                y_batch = y_batches[i]
+
+                activations, z_list = self.forward_pass(x_batch, self.weights)
+
+                gradients = self.backpropagation(
+                    y_batch, activations, z_list, self.weights, lambda_
+                )
+
+                if epoch == 0 and debug:
+                    flag = self.gradient_check(
+                        x_batch, y_batch, gradients, self.weights
+                    )
+                    if not flag:
+                        raise RuntimeError
+
+                self.weights = self.update_weights(
+                    gradients, self.weights, learning_rate
+                )
+
+            full_activations, _ = self.forward_pass(x_data, self.weights)
+
+            cost = self.binary_cross_entropy_loss(
+                full_activations[-1], y_data, self.weights, True, lambda_
+            )
+
             training_epochs_cost.append(cost)
-
-            self.weights = self.update_weights(gradients, self.weights, learning_rate)
 
         return training_epochs_cost
 

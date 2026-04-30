@@ -1,61 +1,125 @@
 import numpy as np
-import numpy as np
+from typing import Tuple, List
+from dataclasses import dataclass
 
-def generate_clean_3d_classification_data(count):
-    x = np.random.uniform(-20, 20, (count, 1))
-    y = np.random.uniform(-20, 20, (count, 1))
 
-    surface = np.sin(x) + np.cos(y) 
+@dataclass
+class Dataset:
+    X_train: np.ndarray
+    Y_train: np.ndarray
+    X_test: np.ndarray
+    Y_test: np.ndarray
+    mean: np.ndarray
+    std: np.ndarray
+    input_dim: int
+ 
+# DATA GENERATION
+ 
+def generate_3d_classification_raw_data(count, surface_func):
+    x = np.random.uniform(-10, 10, (count, 1))
+    y = np.random.uniform(-10, 10, (count, 1))
+
+    surface = surface_func(x, y)
 
     labels = np.random.randint(0, 2, (count, 1))
-    
     offset = np.random.uniform(1.0, 3.0, (count, 1))
 
-    z = np.where(
-        labels == 1,
-        surface + offset,
-        surface - offset
-    )
+    z = np.where(labels == 1, surface + offset, surface - offset)
 
-    x_data = np.hstack((x, y, z))
-    y_data = labels
-
-    return x_data, y_data
+    X = np.hstack((x, y, z))
+    return X, labels
 
 
-def data(count, data_eng=False):
-    x_data, y_data = generate_clean_3d_classification_data(count)
-    # for i in range(x_data.shape[1]):
-    #     cor = pearson_correlation(x_data[:,i], y_data)
+# SAMPLING / SPLIT
+ 
+def sample_dataset(X, y, n):
+    if n > len(X):
+        raise ValueError("n_sample is larger than dataset size")
+    idx = np.random.choice(len(X), n, replace=False)
+    return X[idx], y[idx]
 
-    #     if -0.5 < cor < 0.5:
-    #         new_feature = x_data[:,i] ** 2
-    #         x_data = np.column_stack((x_data, new_feature))
+
+def global_split(X, y, test_ratio=0.2):
+    idx = np.random.permutation(len(X))
+    X, y = X[idx], y[idx]
+
+    split = int(len(X) * (1 - test_ratio))
+    return X[:split], y[:split], X[split:], y[split:]
 
 
-    # 80% train / 20% test
-    split = int(0.8 * count)
+ 
+# FEATURE SELECTION (FIXED)
+ 
+def gini_impurity(probs):
+    return 1 - np.sum(np.square(probs))
 
-    x_train = x_data[:split]
-    y_train = y_data[:split]
-    x_test = x_data[split:]
-    y_test = y_data[split:]
 
-    x_mean = np.mean(x_train, axis=0)
-    x_std = np.std(x_train, axis=0)
+def select_top_splits(X, y, k=2):
+    """Find top-k best (feature, threshold) splits using weighted Gini."""
+    y = y.ravel()
+    n_samples, n_features = X.shape
 
-    x_train = (x_train - x_mean) / x_std
-    x_test = (x_test - x_mean) / x_std
+    candidates = []
 
-    return x_train, y_train, x_test, y_test, x_mean, x_std
+    for f in range(n_features):
+        col = X[:, f]
+        thresholds = np.unique(col)
 
-# def pearson_correlation(x, y):
-#     x_mean= np.mean(x)
-#     y_mean= np.mean(y)
+        for t in thresholds:
+            left = y[col < t]
+            right = y[col >= t]
 
-#     r = (np.sum((x - x_mean) * (y - y_mean))) / (( np.sqrt(np.sum(np. square(x - x_mean)))) *  (np.sqrt(np.sum(np. square(y - y_mean)))))
-#     return r
+            if len(left) == 0 or len(right) == 0:
+                continue
 
-# def decision_tree(x):
+            def gini(arr):
+                p1 = np.mean(arr == 1)
+                p0 = 1 - p1
+                return gini_impurity([p0, p1])
 
-#     pass
+            weighted = (len(left)/n_samples) * gini(left) + (len(right)/n_samples) * gini(right)
+
+            candidates.append((f, t, weighted))
+
+    candidates.sort(key=lambda x: x[2])
+    return candidates[:k]
+
+
+ 
+# FEATURE ENGINEERING (GENERIC)
+ 
+def build_features(X, selected_features: List[Tuple[int, float, float]]):
+    """Create nonlinear features from selected indices."""
+    out = [X]
+
+    for f, _, _ in selected_features:
+        col = X[:, f]
+        out.append(col ** 2)
+        out.append(np.sin(col))
+        out.append(np.cos(col))
+
+    return np.column_stack(out)
+
+# PREPROCESS PIPELINE
+def prep_dataset(X_train_full, y_train_full, X_test, y_test, n_sample, add_feat=False):
+    X_train, y_train = sample_dataset(X_train_full, y_train_full, n_sample)
+
+    if add_feat:
+        features = select_top_splits(X_train, y_train, k=2)
+        X_train = build_features(X_train, features)
+        X_test = build_features(X_test, features)
+
+    mean = X_train.mean(axis=0)
+    std = X_train.std(axis=0)
+    std[std == 0] = 1e-8
+
+    X_train = (X_train - mean) / std
+    X_test = (X_test - mean) / std
+    input_dim = X_train.shape[1]
+    return Dataset(X_train, y_train, X_test, y_test, mean, std, input_dim)
+
+def pearson_correlation(x, y):
+    xm, ym = np.mean(x), np.mean(y)
+    num = np.sum((x - xm) * (y - ym))
+    den = np.sqrt(np.sum((x - xm) ** 2)) * np.sqrt(np.sum((y - ym) ** 2))
+    return num / (den + 1e-8)

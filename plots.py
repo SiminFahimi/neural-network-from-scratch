@@ -1,12 +1,10 @@
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 from dataclasses import dataclass
 from typing import List, Tuple
 
-import matplotlib.pyplot as plt
-import numpy as np
-import os
 
 @dataclass
 class PlotCurve:
@@ -16,7 +14,6 @@ class PlotCurve:
     line_label: list[str]
     title: str
     save_address: str
-
 
 def plot_curves(curve: PlotCurve):
     plt.figure()
@@ -31,14 +28,16 @@ def plot_curves(curve: PlotCurve):
     plt.savefig(curve.save_address)
     plt.show()
 
+def plot_3d_predictions(x_data, y_true, y_pred, x_std, x_mean, surface_func):
 
-def plot_3d_predictions(x_data, y_true, y_pred, x_std, x_mean):
-    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 required for 3D plots
 
     fig = plt.figure(figsize=(9, 7))
     ax = fig.add_subplot(111, projection="3d")
 
-    correct = y_pred == y_true
+    y_true = y_true.reshape(-1, 1)
+    y_pred = y_pred.reshape(-1, 1)
+
+    correct = (y_pred == y_true)
     misclassified = (y_pred != y_true).flatten()
 
     correct_positive = (correct & (y_pred == 1)).flatten()
@@ -50,10 +49,11 @@ def plot_3d_predictions(x_data, y_true, y_pred, x_std, x_mean):
 
     x_data = x_data * x_std + x_mean
 
-    x_vals = np.linspace(-20, 20, 50)
-    y_vals = np.linspace(-20, 20, 50)
+    x_vals = np.linspace(-10, 10, 60)
+    y_vals = np.linspace(-10, 10, 60)
     x_grid, y_grid = np.meshgrid(x_vals, y_vals)
-    z_grid = np.sin(x_grid) + np.cos(y_grid)
+
+    z_grid = surface_func(x_grid, y_grid)
 
     ax.plot_surface(x_grid, y_grid, z_grid, alpha=0.4)
 
@@ -87,8 +87,10 @@ def plot_3d_predictions(x_data, y_true, y_pred, x_std, x_mean):
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")
+    ax.legend()
 
     plt.title("3D Predictions + Decision Surface")
+
     os.makedirs("results", exist_ok=True)
     plt.savefig("results/prediction_3d.png", dpi=300, bbox_inches="tight")
     plt.show()
