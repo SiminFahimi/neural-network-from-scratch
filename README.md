@@ -63,6 +63,23 @@ Based on the structure of the dataset, several engineered features were added:
 
 The performance gain was small but consistent.
 
+## Training Curve
+![cost each epoch](results/loss.png)
+
+## Effect of size
+![accuracy vs size](results/size_effect_on_accuracy.png)
+
+![effect of increasing size](results/size_effect_on_cost.png)
+
+## Lamba comparison
+![Lamba comparison](results/lambda_effect.png)
+
+## Learning rate comparison
+![lr comparison](results/lr_effect.png)
+
+## 3D Predictions
+![Predictions](results/prediction_3d.png)
+
 ---
 
 ## Experiments Conducted
