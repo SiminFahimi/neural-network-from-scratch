@@ -175,7 +175,6 @@ The performance gain was small but consistent.
 
 - Adam optimizer
 - RMSProp optimizer
-- Mini-batch gradient descent
 - Deeper neural networks
 - Multi-class classification
 - PyTorch reimplementation for benchmarking
